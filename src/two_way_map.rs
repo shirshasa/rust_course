@@ -4,7 +4,7 @@ use std::{fmt::Debug, ops::RangeBounds, ops::Bound::Included, rc::Rc};
 
 
 #[derive(Debug, Default)]
-struct TwoWayMap<L, R> {
+pub struct TwoWayMap<L, R> {
     left_to_right: std::collections::BTreeMap<Rc<L>, Rc<R>>,
     right_to_left: std::collections::BTreeMap<Rc<R>, Rc<L>>,
 }
@@ -191,7 +191,7 @@ impl<L: Ord, R: Ord> FromIterator<(L, R)> for TwoWayMap<L, R> {
     }
 }
 
-struct IntoIter<L,R>{
+pub struct IntoIter<L,R>{
     left_to_right_iter: std::collections::btree_map::IntoIter<Rc<L>, Rc<R>>,
     right_to_left: std::collections::BTreeMap<Rc<R>, Rc<L>>,
 }
@@ -235,7 +235,7 @@ impl <L: Ord, R: Ord> IntoIterator for TwoWayMap<L, R> {
 }
 
 
-struct RefIter<'l, L, R>{
+pub struct RefIter<'l, L, R>{
     iter: collections::btree_map::Iter<'l, Rc<L>, Rc<R>>,
 }
 
@@ -1067,4 +1067,28 @@ pub(crate) fn test_ref_into_iter_no_clone_trait(){
     };
 }
 
+#[test]
+pub(crate) fn test_debug(){
+    let mut map = TwoWayMap::new();
+    map.insert(1, 2);
+    map.insert(3, 4);
+    map.insert(5, 6);
 
+    println!("{:?}", map);
+
+    let mut map2 = TwoWayMap::new();
+    map2.insert(String::from("hello"), String::from("world"));
+    map2.insert(String::from("foo"), String::from("bar"));
+    map2.insert(String::from("baz"), String::from("qux"));
+
+    println!("{:?}", map2);
+}
+
+#[test]
+pub(crate) fn test_default(){
+    let map: TwoWayMap<i32, i32> = TwoWayMap::default();
+    assert_eq!(map.len(), 0);
+
+    let map2: TwoWayMap<String, String> = TwoWayMap::default();
+    assert_eq!(map2.len(), 0);
+}
