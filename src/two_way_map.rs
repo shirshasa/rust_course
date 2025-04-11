@@ -31,21 +31,6 @@ impl<L: Ord, R: Ord> TwoWayMap<L, R> {
         self.right_to_left.clear();
     }
 
-    fn insert_by_rc(&mut self, left: &Rc<L>, right: &Rc<R>) {
-        // Check if left already exists
-        if let Some(existing_right) = self.left_to_right.get(left) {
-            self.right_to_left.remove(existing_right);
-        }
-        // Check if right already exists
-        if let Some(existing_left) = self.right_to_left.get(right) {
-            self.left_to_right.remove(existing_left);
-        }
-
-        self.left_to_right.insert(left.clone(), right.clone());
-        self.right_to_left.insert(right.clone(), left.clone());
-        // TODO
-    }
-
     pub fn insert(&mut self, left: L, right: R) {
         // Check if left already exists
         if let Some(existing_right) = self.left_to_right.get(&left) {
@@ -176,13 +161,16 @@ impl<L: Ord, R: Ord> TwoWayMap<L, R> {
 
 }
 
-impl<L: Ord, R: Ord> Clone for TwoWayMap<L, R> {
+impl<L: Ord, R: Ord> Clone for TwoWayMap<L, R> 
+where L: Clone, R: Clone{
     fn clone(&self) -> Self {
-        let mut new_map: TwoWayMap<L, R> = TwoWayMap::new();
+        let mut other = TwoWayMap::new();
         for (left, right) in self.left_to_right.iter() {
-            new_map.insert_by_rc(left, right);
+            let left =left.as_ref().clone();
+            let right = right.as_ref().clone();
+            other.insert(left, right);
         }
-        new_map
+        other
     }
 }
 
@@ -433,11 +421,14 @@ pub(crate) fn test_remove_by_left(){
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(3, 4);
+
     assert_eq!(map.len(), 2);
     assert_eq!(map.remove_by_left(&1), Some((1, 2)));
     assert_eq!(map.len(), 1);
     assert_eq!(map.get_by_left(&1), None);
     assert_eq!(map.get_by_right(&2), None);
+
+    assert_eq!(map.get_by_left(&3), Some(&4));
 }
 
 #[test]
@@ -445,11 +436,14 @@ pub(crate) fn test_remove_by_right(){
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(3, 4);
+
     assert_eq!(map.len(), 2);
     assert_eq!(map.remove_by_right(&2), Some((2, 1)));
     assert_eq!(map.len(), 1);
     assert_eq!(map.get_by_left(&1), None);
     assert_eq!(map.get_by_right(&2), None);
+
+    assert_eq!(map.get_by_left(&3), Some(&4));
 }
 
 #[test]
@@ -617,11 +611,9 @@ pub(crate) fn test_range() {
 
     assert_eq!(range.len(), 2);
     assert_eq!(range, vec![(&1, &2), (&3, &4)]);
-    println!("range: {:?}", range);
 
     let range: Vec<_> = map.right_range(2..=4).collect();
 
-    println!("range: {:?}", range);
     assert_eq!(range.len(), 2);
     assert_eq!(range, vec![(&2, &1), (&4, &3)]);
 
@@ -685,10 +677,26 @@ pub(crate) fn test_from_iterator(){
     assert_eq!(map.len(), 3);
     assert_eq!(map.get_by_left(&1), Some(&2));
     assert_eq!(map.get_by_right(&4), Some(&3));
+    assert_eq!(map.get_by_left(&5), Some(&6));
 }
 
 #[test]
 pub(crate) fn test_into_iter(){
+    let mut map = TwoWayMap::new();
+    map.insert(1, 2);
+    map.insert(5, 6);
+    map.insert(3, 4);
+
+    let mut iter: IntoIter<i32, i32> = map.into_iter();
+    assert_eq!(iter.next(), Some((1, 2)));
+    assert_eq!(iter.next(), Some((3, 4)));
+    assert_eq!(iter.next(), Some((5, 6)));
+
+    assert_eq!(iter.next(), None);
+}
+
+#[test]
+pub(crate) fn test_into_iter_with_clone(){
     let mut map1 = TwoWayMap::new();
     map1.insert(1, 2);
     map1.insert(5, 6);
@@ -730,26 +738,10 @@ pub(crate) fn test_into_iter_in_for_loop(){
     map.insert(5, 6);
     map.insert(3, 4);
 
-
-    let mut iter = map.into_iter();
-    assert_eq!(iter.next(), Some((1, 2)));
-    assert_eq!(iter.next(), Some((3, 4)));
-    assert_eq!(iter.next(), Some((5, 6)));
-    assert_eq!(iter.next(), None);
-
-    // create BiMap from library
-    // let mut bimap = BiBTreeMap::new();
-    // bimap.insert(1, 2);
-    // bimap.insert(3, 4);
-    // bimap.insert(5, 6);
-    // for x in bimap.into_iter(){
-    //     println!("x: {:?}", x);
-    // };
-
 }
 
 #[test]
-pub(crate) fn test_into_iter_consumes_map(){
+pub(crate) fn test_ref_into_iter(){
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(3, 4);
