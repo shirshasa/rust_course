@@ -442,8 +442,11 @@ pub(crate) fn test_insert_string(){
 pub(crate) fn test_insert_no_overwrite() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
+
     assert_eq!(map.len(), 1);
     assert_eq!(map.insert_no_overwrite(1, 3), Err((1, 3)));
+    assert_eq!(map.len(), 1);
+    assert_eq!(map.insert_no_overwrite(3, 2) , Err((3, 2)));
     assert_eq!(map.len(), 1);
     assert_eq!(map.insert_no_overwrite(3, 4), Ok(()));
     assert_eq!(map.len(), 2);
@@ -456,6 +459,8 @@ pub(crate) fn test_insert_no_overwrite_string(){
     map.insert(String::from("hello"), String::from("world"));
     assert_eq!(map.len(), 1);
     assert_eq!(map.insert_no_overwrite(String::from("hello"), String::from("foo")), Err((String::from("hello"), String::from("foo"))));
+    assert_eq!(map.len(), 1);
+    assert_eq!(map.insert_no_overwrite(String::from("hi"), String::from("world")), Err((String::from("hi"), String::from("world"))));
     assert_eq!(map.len(), 1);
     assert_eq!(map.insert_no_overwrite(String::from("foo"), String::from("bar")), Ok(()));
     assert_eq!(map.len(), 2);
