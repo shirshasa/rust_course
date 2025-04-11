@@ -1033,6 +1033,17 @@ pub(crate) fn test_into_iter_in_for_loop(){
 }
 
 #[test]
+pub(crate) fn test_into_iter_no_clone_trait(){
+    let mut map = TwoWayMap::new();
+    map.insert(SomeStruct { a: 101, b: 202 }, SomeStruct { a: 303, b: 403 });
+    map.insert(SomeStruct { a: 0, b: 1 }, SomeStruct { a: 1, b: 0 });
+
+    for x in map{
+        println!("x: {:?}", x);
+    };
+}
+
+#[test]
 pub(crate) fn test_ref_into_iter(){
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
@@ -1043,6 +1054,17 @@ pub(crate) fn test_ref_into_iter(){
         println!("x: {:?}", x);
     };
 
+}
+
+#[test]
+pub(crate) fn test_ref_into_iter_no_clone_trait(){
+    let mut map = TwoWayMap::new();
+    map.insert(SomeStruct { a: 101, b: 202 }, SomeStruct { a: 303, b: 403 });
+    map.insert(SomeStruct { a: 0, b: 1 }, SomeStruct { a: 1, b: 0 });
+
+    for x in &map{
+        println!("x: {:?}", x);
+    };
 }
 
 
