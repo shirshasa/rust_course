@@ -1,5 +1,5 @@
 use std::collections;
-use std::{fmt::Debug, ops::Bound::Included, ops::RangeBounds, rc::Rc};
+use std::{fmt::Debug, ops::RangeBounds, rc::Rc};
 
 #[derive(Debug, Default)]
 pub struct TwoWayMap<L, R> {
@@ -58,8 +58,6 @@ impl<L: Ord, R: Ord> TwoWayMap<L, R> {
         if let Some(right) = self.left_to_right.remove(left) {
             let left = self.right_to_left.remove(&right).unwrap();
 
-            // self.left_to_right.remove(&left);
-
             // Convert Rc to L and R
             let left = Rc::try_unwrap(left).ok().unwrap();
             let right = Rc::try_unwrap(right).ok().unwrap();
@@ -87,7 +85,6 @@ impl<L: Ord, R: Ord> TwoWayMap<L, R> {
 
     pub fn get_by_left(&self, left: &L) -> Option<&R> {
         if let Some(right) = self.left_to_right.get(left) {
-            // Should we increment rc???
             return Some(right.as_ref());
         }
         None
