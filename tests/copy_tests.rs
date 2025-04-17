@@ -16,7 +16,7 @@ fn test_clone_counts() {
     assert_eq!(recorder.borrow().clones, 1);
     assert_eq!(recorder.borrow().dropped, false);
 
-    let map3 = map2.clone();
+    let _map3 = map2.clone();
     assert_eq!(recorder.borrow().clones, 2);
     assert_eq!(recorder.borrow().dropped, false);
 }
@@ -30,7 +30,7 @@ fn test_moves() {
     assert_eq!(recorder.borrow().clones, 0);
     assert_eq!(recorder.borrow().dropped, false);
 
-    let map2 = map;
+    let _map2 = map;
     assert_eq!(recorder.borrow().clones, 0);
     assert_eq!(recorder.borrow().dropped, false);
 }
