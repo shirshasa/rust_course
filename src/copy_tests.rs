@@ -1,9 +1,8 @@
 use crate::recorder::create_dummy;
 use crate::two_way_map::TwoWayMap;
 
-
 #[test]
-fn test_clone_counts(){
+fn test_clone_counts() {
     let (recorder, dummy) = create_dummy();
 
     let mut map = TwoWayMap::new();
@@ -21,7 +20,7 @@ fn test_clone_counts(){
 }
 
 #[test]
-fn test_moves(){
+fn test_moves() {
     let (recorder, dummy) = create_dummy();
 
     let mut map = TwoWayMap::new();
@@ -35,7 +34,7 @@ fn test_moves(){
 }
 
 #[test]
-fn test_into_iter_clone_counts(){
+fn test_into_iter_clone_counts() {
     let (recorder, dummy) = create_dummy();
 
     {
@@ -43,15 +42,14 @@ fn test_into_iter_clone_counts(){
         map.insert(1, dummy);
         assert_eq!(recorder.borrow().clones, 0);
         assert_eq!(recorder.borrow().dropped, false);
-    
+
         let mut iter = map.into_iter();
         assert_eq!(recorder.borrow().clones, 0);
         assert_eq!(recorder.borrow().dropped, false);
-    
+
         let (key, value) = iter.next().unwrap();
         println!("key: {}, value: {:?}", key, value);
     }
     assert_eq!(recorder.borrow().clones, 0);
     assert_eq!(recorder.borrow().dropped, true);
-
 }
