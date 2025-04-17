@@ -1,6 +1,5 @@
 use std::{cell::RefCell, rc::Rc};
 
-
 #[derive(Default, Debug)]
 pub struct Recorder {
     pub clones: usize,
@@ -30,7 +29,10 @@ impl PartialOrd for Dummy {
 
 impl Ord for Dummy {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.recorder.borrow().clones.cmp(&other.recorder.borrow().clones)
+        self.recorder
+            .borrow()
+            .clones
+            .cmp(&other.recorder.borrow().clones)
     }
 }
 

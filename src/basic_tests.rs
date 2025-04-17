@@ -1,6 +1,5 @@
 use crate::two_way_map::TwoWayMap;
-use std::{ops::RangeBounds, ops::Bound::Included};
-
+use std::{ops::Bound::Included, ops::RangeBounds};
 
 #[derive(Debug, PartialEq, Eq, Ord, PartialOrd)]
 pub(crate) struct SomeStruct {
@@ -27,7 +26,7 @@ pub(crate) fn test_new_no_copy_trait() {
 }
 
 #[test]
-pub(crate) fn test_different_types_new(){
+pub(crate) fn test_different_types_new() {
     let mut map = TwoWayMap::<SomeStruct, i32>::new();
     assert_eq!(map.len(), 0);
 
@@ -35,7 +34,6 @@ pub(crate) fn test_different_types_new(){
     let struct2 = SomeStruct { a: 3, b: 4 };
     map.insert(struct1, 5);
     map.insert(struct2, 6);
-
 
     assert_eq!(map.len(), 2);
 
@@ -87,7 +85,7 @@ pub(crate) fn test_is_empty_string() {
 }
 
 #[test]
-pub(crate) fn test_clear(){
+pub(crate) fn test_clear() {
     let mut map = TwoWayMap::<SomeStruct, i32>::new();
     assert!(map.is_empty());
     map.insert(SomeStruct { a: 1, b: 2 }, 3);
@@ -100,7 +98,7 @@ pub(crate) fn test_clear(){
 }
 
 #[test]
-pub(crate) fn test_clear_string(){
+pub(crate) fn test_clear_string() {
     let mut map = TwoWayMap::<String, String>::new();
     assert!(map.is_empty());
     map.insert(String::from("hello"), String::from("world"));
@@ -129,7 +127,7 @@ pub(crate) fn test_len() {
 }
 
 #[test]
-pub(crate) fn test_len_string(){
+pub(crate) fn test_len_string() {
     let mut map = TwoWayMap::<String, String>::new();
     assert_eq!(map.len(), 0);
     map.insert(String::from("hello"), String::from("world"));
@@ -153,17 +151,29 @@ pub(crate) fn test_insert() {
 }
 
 #[test]
-pub(crate) fn test_insert_string(){
+pub(crate) fn test_insert_string() {
     let mut map = TwoWayMap::<String, String>::new();
     map.insert(String::from("hello"), String::from("world"));
     assert_eq!(map.len(), 1);
-    assert_eq!(map.get_by_left(&String::from("hello")), Some(&String::from("world")));
-    assert_eq!(map.get_by_right(&String::from("world")), Some(&String::from("hello")));
+    assert_eq!(
+        map.get_by_left(&String::from("hello")),
+        Some(&String::from("world"))
+    );
+    assert_eq!(
+        map.get_by_right(&String::from("world")),
+        Some(&String::from("hello"))
+    );
 
     map.insert(String::from("foo"), String::from("bar"));
     assert_eq!(map.len(), 2);
-    assert_eq!(map.get_by_left(&String::from("foo")), Some(&String::from("bar")));
-    assert_eq!(map.get_by_right(&String::from("bar")), Some(&String::from("foo")));
+    assert_eq!(
+        map.get_by_left(&String::from("foo")),
+        Some(&String::from("bar"))
+    );
+    assert_eq!(
+        map.get_by_right(&String::from("bar")),
+        Some(&String::from("foo"))
+    );
 }
 
 #[test]
@@ -174,28 +184,36 @@ pub(crate) fn test_insert_no_overwrite() {
     assert_eq!(map.len(), 1);
     assert_eq!(map.insert_no_overwrite(1, 3), Err((1, 3)));
     assert_eq!(map.len(), 1);
-    assert_eq!(map.insert_no_overwrite(3, 2) , Err((3, 2)));
+    assert_eq!(map.insert_no_overwrite(3, 2), Err((3, 2)));
     assert_eq!(map.len(), 1);
     assert_eq!(map.insert_no_overwrite(3, 4), Ok(()));
     assert_eq!(map.len(), 2);
 }
 
-
 #[test]
-pub(crate) fn test_insert_no_overwrite_string(){
+pub(crate) fn test_insert_no_overwrite_string() {
     let mut map = TwoWayMap::<String, String>::new();
     map.insert(String::from("hello"), String::from("world"));
     assert_eq!(map.len(), 1);
-    assert_eq!(map.insert_no_overwrite(String::from("hello"), String::from("foo")), Err((String::from("hello"), String::from("foo"))));
+    assert_eq!(
+        map.insert_no_overwrite(String::from("hello"), String::from("foo")),
+        Err((String::from("hello"), String::from("foo")))
+    );
     assert_eq!(map.len(), 1);
-    assert_eq!(map.insert_no_overwrite(String::from("hi"), String::from("world")), Err((String::from("hi"), String::from("world"))));
+    assert_eq!(
+        map.insert_no_overwrite(String::from("hi"), String::from("world")),
+        Err((String::from("hi"), String::from("world")))
+    );
     assert_eq!(map.len(), 1);
-    assert_eq!(map.insert_no_overwrite(String::from("foo"), String::from("bar")), Ok(()));
+    assert_eq!(
+        map.insert_no_overwrite(String::from("foo"), String::from("bar")),
+        Ok(())
+    );
     assert_eq!(map.len(), 2);
 }
 
 #[test]
-pub(crate) fn test_remove_by_left(){
+pub(crate) fn test_remove_by_left() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(3, 4);
@@ -210,22 +228,28 @@ pub(crate) fn test_remove_by_left(){
 }
 
 #[test]
-pub(crate) fn test_remove_by_left_string(){
+pub(crate) fn test_remove_by_left_string() {
     let mut map = TwoWayMap::<String, String>::new();
     map.insert(String::from("hello"), String::from("world"));
     map.insert(String::from("foo"), String::from("bar"));
 
     assert_eq!(map.len(), 2);
-    assert_eq!(map.remove_by_left(&String::from("hello")), Some((String::from("hello"), String::from("world"))));
+    assert_eq!(
+        map.remove_by_left(&String::from("hello")),
+        Some((String::from("hello"), String::from("world")))
+    );
     assert_eq!(map.len(), 1);
     assert_eq!(map.get_by_left(&String::from("hello")), None);
     assert_eq!(map.get_by_right(&String::from("world")), None);
 
-    assert_eq!(map.get_by_left(&String::from("foo")), Some(&String::from("bar")));
+    assert_eq!(
+        map.get_by_left(&String::from("foo")),
+        Some(&String::from("bar"))
+    );
 }
 
 #[test]
-pub(crate) fn test_remove_by_right(){
+pub(crate) fn test_remove_by_right() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(3, 4);
@@ -240,22 +264,28 @@ pub(crate) fn test_remove_by_right(){
 }
 
 #[test]
-pub(crate) fn test_remove_by_right_string(){
+pub(crate) fn test_remove_by_right_string() {
     let mut map = TwoWayMap::<String, String>::new();
     map.insert(String::from("hello"), String::from("world"));
     map.insert(String::from("foo"), String::from("bar"));
 
     assert_eq!(map.len(), 2);
-    assert_eq!(map.remove_by_right(&String::from("world")), Some((String::from("world"), String::from("hello"))));
+    assert_eq!(
+        map.remove_by_right(&String::from("world")),
+        Some((String::from("world"), String::from("hello")))
+    );
     assert_eq!(map.len(), 1);
     assert_eq!(map.get_by_left(&String::from("hello")), None);
     assert_eq!(map.get_by_right(&String::from("world")), None);
 
-    assert_eq!(map.get_by_left(&String::from("foo")), Some(&String::from("bar")));
+    assert_eq!(
+        map.get_by_left(&String::from("foo")),
+        Some(&String::from("bar"))
+    );
 }
 
 #[test]
-pub(crate) fn test_remove_some_struct(){
+pub(crate) fn test_remove_some_struct() {
     // by left
     let mut map = TwoWayMap::<SomeStruct, SomeStruct>::new();
     assert_eq!(map.len(), 0);
@@ -265,7 +295,10 @@ pub(crate) fn test_remove_some_struct(){
     map.insert(struct1, struct2);
 
     assert_eq!(map.len(), 1);
-    assert_eq!(map.get_by_left(&SomeStruct { a: 1, b: 2 }), Some(&SomeStruct { a: 3, b: 4 }));
+    assert_eq!(
+        map.get_by_left(&SomeStruct { a: 1, b: 2 }),
+        Some(&SomeStruct { a: 3, b: 4 })
+    );
 
     map.remove_by_left(&SomeStruct { a: 1, b: 2 });
 
@@ -278,7 +311,10 @@ pub(crate) fn test_remove_some_struct(){
     map.insert(struct3, struct4);
 
     assert_eq!(map.len(), 1);
-    assert_eq!(map.get_by_left(&SomeStruct { a: 5, b: 6 }), Some(&SomeStruct { a: 7, b: 8 }));
+    assert_eq!(
+        map.get_by_left(&SomeStruct { a: 5, b: 6 }),
+        Some(&SomeStruct { a: 7, b: 8 })
+    );
 
     map.remove_by_right(&SomeStruct { a: 7, b: 8 });
 
@@ -287,7 +323,7 @@ pub(crate) fn test_remove_some_struct(){
 }
 
 #[test]
-pub(crate) fn test_get(){
+pub(crate) fn test_get() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(3, 4);
@@ -300,21 +336,33 @@ pub(crate) fn test_get(){
 }
 
 #[test]
-pub(crate) fn test_get_string(){
+pub(crate) fn test_get_string() {
     let mut map = TwoWayMap::<String, String>::new();
     map.insert(String::from("hello"), String::from("world"));
     map.insert(String::from("foo"), String::from("bar"));
 
-    assert_eq!(map.get_by_left(&String::from("hello")), Some(&String::from("world")));
-    assert_eq!(map.get_by_right(&String::from("world")), Some(&String::from("hello")));
-    assert_eq!(map.get_by_left(&String::from("foo")), Some(&String::from("bar")));
-    assert_eq!(map.get_by_right(&String::from("bar")), Some(&String::from("foo")));
+    assert_eq!(
+        map.get_by_left(&String::from("hello")),
+        Some(&String::from("world"))
+    );
+    assert_eq!(
+        map.get_by_right(&String::from("world")),
+        Some(&String::from("hello"))
+    );
+    assert_eq!(
+        map.get_by_left(&String::from("foo")),
+        Some(&String::from("bar"))
+    );
+    assert_eq!(
+        map.get_by_right(&String::from("bar")),
+        Some(&String::from("foo"))
+    );
     assert_eq!(map.get_by_left(&String::from("baz")), None);
     assert_eq!(map.get_by_right(&String::from("qux")), None);
 }
 
 #[test]
-pub(crate) fn test_contains(){
+pub(crate) fn test_contains() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(3, 4);
@@ -331,11 +379,10 @@ pub(crate) fn test_contains(){
     assert!(map3.contains_left(&"hello"));
     assert!(map3.contains_right(&"world"));
     assert!(!map3.contains_left(&"foo"));
-
 }
 
 #[test]
-pub(crate) fn test_contains_some_struct(){
+pub(crate) fn test_contains_some_struct() {
     let mut map2 = TwoWayMap::new();
     let s1 = SomeStruct { a: 1, b: 2 };
     let s2 = SomeStruct { a: 3, b: 4 };
@@ -346,7 +393,7 @@ pub(crate) fn test_contains_some_struct(){
 }
 
 #[test]
-pub(crate) fn test_contains_string(){
+pub(crate) fn test_contains_string() {
     let mut map4 = TwoWayMap::new();
     let s1 = String::from("hello");
     let s2 = String::from("world");
@@ -368,7 +415,7 @@ pub(crate) fn test_pairs() {
 }
 
 #[test]
-pub(crate) fn test_pairs_string(){
+pub(crate) fn test_pairs_string() {
     let mut map = TwoWayMap::new();
     map.insert(String::from("hello"), String::from("world"));
     map.insert(String::from("foo"), String::from("bar"));
@@ -379,7 +426,7 @@ pub(crate) fn test_pairs_string(){
 }
 
 #[test]
-pub(crate) fn test_pairs_ascending(){
+pub(crate) fn test_pairs_ascending() {
     // test that output is ascending
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
@@ -398,7 +445,7 @@ pub(crate) fn test_pairs_ascending(){
 }
 
 #[test]
-pub(crate) fn test_pairs_are_not_consumed(){
+pub(crate) fn test_pairs_are_not_consumed() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(3, 4);
@@ -414,7 +461,7 @@ pub(crate) fn test_pairs_are_not_consumed(){
 }
 
 #[test]
-pub(crate) fn test_pairs_are_not_consumed_string(){
+pub(crate) fn test_pairs_are_not_consumed_string() {
     let mut map = TwoWayMap::new();
     map.insert(String::from("hello"), String::from("world"));
     map.insert(String::from("foo"), String::from("bar"));
@@ -425,12 +472,18 @@ pub(crate) fn test_pairs_are_not_consumed_string(){
 
     // Check that the map is still intact
     assert_eq!(map.len(), 2);
-    assert_eq!(map.get_by_left(&String::from("hello")), Some(&String::from("world")));
-    assert_eq!(map.get_by_right(&String::from("bar")), Some(&String::from("foo")));
+    assert_eq!(
+        map.get_by_left(&String::from("hello")),
+        Some(&String::from("world"))
+    );
+    assert_eq!(
+        map.get_by_right(&String::from("bar")),
+        Some(&String::from("foo"))
+    );
 }
 
 #[test]
-pub(crate) fn test_left_values(){
+pub(crate) fn test_left_values() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(5, 20);
@@ -443,7 +496,7 @@ pub(crate) fn test_left_values(){
 }
 
 #[test]
-pub(crate) fn test_left_values_string(){
+pub(crate) fn test_left_values_string() {
     let mut map = TwoWayMap::new();
     map.insert(String::from("hello"), String::from("world"));
     map.insert(String::from("foo"), String::from("bar"));
@@ -451,11 +504,18 @@ pub(crate) fn test_left_values_string(){
 
     let left_values: Vec<_> = map.left_values().collect();
     assert_eq!(left_values.len(), 3);
-    assert_eq!(left_values, vec![&String::from("baz"), &String::from("foo"), &String::from("hello"), ]);
+    assert_eq!(
+        left_values,
+        vec![
+            &String::from("baz"),
+            &String::from("foo"),
+            &String::from("hello"),
+        ]
+    );
 }
 
 #[test]
-pub(crate) fn test_right_values(){
+pub(crate) fn test_right_values() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(5, 20);
@@ -467,7 +527,7 @@ pub(crate) fn test_right_values(){
 }
 
 #[test]
-pub(crate) fn test_right_values_string(){
+pub(crate) fn test_right_values_string() {
     let mut map = TwoWayMap::new();
     map.insert(String::from("hello"), String::from("world"));
     map.insert(String::from("foo"), String::from("bar"));
@@ -475,7 +535,14 @@ pub(crate) fn test_right_values_string(){
 
     let right_values: Vec<_> = map.right_values().collect();
     assert_eq!(right_values.len(), 3);
-    assert_eq!(right_values, vec![&String::from("bar"), &String::from("qux"), &String::from("world")]);
+    assert_eq!(
+        right_values,
+        vec![
+            &String::from("bar"),
+            &String::from("qux"),
+            &String::from("world")
+        ]
+    );
 }
 
 #[test]
@@ -500,7 +567,7 @@ pub(crate) fn test_range() {
 }
 
 #[test]
-pub(crate) fn test_range_literal_string(){
+pub(crate) fn test_range_literal_string() {
     let mut map = TwoWayMap::new();
     map.insert("hello", "world");
     map.insert("foo", "bar");
@@ -513,11 +580,10 @@ pub(crate) fn test_range_literal_string(){
     let range: Vec<_> = map.left_range("a".."f").collect();
     assert_eq!(range.len(), 1);
     assert_eq!(range, vec![(&"baz", &"qux")]);
-
 }
 
 #[test]
-pub(crate) fn test_range_string(){
+pub(crate) fn test_range_string() {
     let mut map = TwoWayMap::new();
     map.insert(String::from("hello"), String::from("world"));
     map.insert(String::from("foo"), String::from("bar"));
@@ -527,7 +593,13 @@ pub(crate) fn test_range_string(){
     let end = "foo".to_string();
     let range: Vec<_> = map.left_range(&start..=&end).collect();
     assert_eq!(range.len(), 2);
-    assert_eq!(range, vec![(&String::from("baz"), &String::from("qux")), (&String::from("foo"), &String::from("bar"))]);
+    assert_eq!(
+        range,
+        vec![
+            (&String::from("baz"), &String::from("qux")),
+            (&String::from("foo"), &String::from("bar"))
+        ]
+    );
 
     let range: Vec<_> = map.left_range(&start..&end).collect();
     assert_eq!(range.len(), 1);
@@ -571,7 +643,7 @@ pub(crate) fn test_retain() {
 }
 
 #[test]
-pub(crate) fn test_retain_string(){
+pub(crate) fn test_retain_string() {
     let mut map = TwoWayMap::new();
     map.insert(String::from("hello"), String::from("world"));
     map.insert(String::from("foo"), String::from("bar"));
@@ -583,8 +655,14 @@ pub(crate) fn test_retain_string(){
     map.retain(|left, right| left == "foo" || right == "qux");
 
     assert_eq!(map.len(), 2);
-    assert_eq!(map.get_by_left(&String::from("foo")), Some(&String::from("bar")));
-    assert_eq!(map.get_by_right(&String::from("qux")), Some(&String::from("baz")));
+    assert_eq!(
+        map.get_by_left(&String::from("foo")),
+        Some(&String::from("bar"))
+    );
+    assert_eq!(
+        map.get_by_right(&String::from("qux")),
+        Some(&String::from("baz"))
+    );
 }
 
 #[test]
@@ -604,7 +682,7 @@ pub(crate) fn test_clone() {
 }
 
 #[test]
-pub(crate) fn test_clone_string(){
+pub(crate) fn test_clone_string() {
     let mut map = TwoWayMap::new();
     map.insert(String::from("hello"), String::from("world"));
     map.insert(String::from("foo"), String::from("bar"));
@@ -620,7 +698,7 @@ pub(crate) fn test_clone_string(){
 }
 
 #[test]
-pub(crate) fn test_extend(){
+pub(crate) fn test_extend() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(3, 4);
@@ -634,21 +712,30 @@ pub(crate) fn test_extend(){
 }
 
 #[test]
-pub(crate) fn test_extend_string(){
+pub(crate) fn test_extend_string() {
     let mut map = TwoWayMap::new();
     map.insert(String::from("hello"), String::from("world"));
     map.insert(String::from("foo"), String::from("bar"));
 
-    let new_pairs = vec![(String::from("baz"), String::from("qux")), (String::from("quux"), String::from("corge"))];
+    let new_pairs = vec![
+        (String::from("baz"), String::from("qux")),
+        (String::from("quux"), String::from("corge")),
+    ];
     map.extend(new_pairs);
 
     assert_eq!(map.len(), 4);
-    assert_eq!(map.get_by_left(&String::from("baz")), Some(&String::from("qux")));
-    assert_eq!(map.get_by_right(&String::from("corge")), Some(&String::from("quux")));
+    assert_eq!(
+        map.get_by_left(&String::from("baz")),
+        Some(&String::from("qux"))
+    );
+    assert_eq!(
+        map.get_by_right(&String::from("corge")),
+        Some(&String::from("quux"))
+    );
 }
 
 #[test]
-pub(crate) fn test_from_iterator(){
+pub(crate) fn test_from_iterator() {
     let pairs = vec![(1, 2), (3, 4), (5, 6)];
     let map: TwoWayMap<i32, i32> = TwoWayMap::from_iter(pairs);
 
@@ -659,17 +746,26 @@ pub(crate) fn test_from_iterator(){
 }
 
 #[test]
-pub(crate) fn test_from_iterator_string(){
-    let pairs = vec![(String::from("hello"), String::from("world")), (String::from("foo"), String::from("bar"))];
+pub(crate) fn test_from_iterator_string() {
+    let pairs = vec![
+        (String::from("hello"), String::from("world")),
+        (String::from("foo"), String::from("bar")),
+    ];
     let map: TwoWayMap<String, String> = TwoWayMap::from_iter(pairs);
 
     assert_eq!(map.len(), 2);
-    assert_eq!(map.get_by_left(&String::from("hello")), Some(&String::from("world")));
-    assert_eq!(map.get_by_right(&String::from("bar")), Some(&String::from("foo")));
+    assert_eq!(
+        map.get_by_left(&String::from("hello")),
+        Some(&String::from("world"))
+    );
+    assert_eq!(
+        map.get_by_right(&String::from("bar")),
+        Some(&String::from("foo"))
+    );
 }
 
 #[test]
-pub(crate) fn test_into_iter(){
+pub(crate) fn test_into_iter() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(5, 6);
@@ -684,22 +780,31 @@ pub(crate) fn test_into_iter(){
 }
 
 #[test]
-pub(crate) fn test_into_iter_string(){
+pub(crate) fn test_into_iter_string() {
     let mut map = TwoWayMap::new();
     map.insert(String::from("hello"), String::from("world"));
     map.insert(String::from("foo"), String::from("bar"));
     map.insert(String::from("baz"), String::from("qux"));
 
     let mut iter = map.into_iter();
-    assert_eq!(iter.next(), Some((String::from("baz"), String::from("qux"))));
-    assert_eq!(iter.next(), Some((String::from("foo"), String::from("bar"))));
-    assert_eq!(iter.next(), Some((String::from("hello"), String::from("world"))));
+    assert_eq!(
+        iter.next(),
+        Some((String::from("baz"), String::from("qux")))
+    );
+    assert_eq!(
+        iter.next(),
+        Some((String::from("foo"), String::from("bar")))
+    );
+    assert_eq!(
+        iter.next(),
+        Some((String::from("hello"), String::from("world")))
+    );
 
     assert_eq!(iter.next(), None);
 }
 
 #[test]
-pub(crate) fn test_into_iter_with_clone(){
+pub(crate) fn test_into_iter_with_clone() {
     let mut map1 = TwoWayMap::new();
     map1.insert(1, 2);
     map1.insert(5, 6);
@@ -716,7 +821,7 @@ pub(crate) fn test_into_iter_with_clone(){
 }
 
 #[test]
-pub(crate) fn test_into_iter_string_with_clone(){
+pub(crate) fn test_into_iter_string_with_clone() {
     let mut map1 = TwoWayMap::new();
     map1.insert(String::from("hello"), String::from("world"));
     map1.insert(String::from("foo"), String::from("bar"));
@@ -725,24 +830,32 @@ pub(crate) fn test_into_iter_string_with_clone(){
     let map = map1.clone();
 
     let mut iter = map.into_iter();
-    assert_eq!(iter.next(), Some((String::from("baz"), String::from("qux"))));
-    assert_eq!(iter.next(), Some((String::from("foo"), String::from("bar"))));
-    assert_eq!(iter.next(), Some((String::from("hello"), String::from("world"))));
+    assert_eq!(
+        iter.next(),
+        Some((String::from("baz"), String::from("qux")))
+    );
+    assert_eq!(
+        iter.next(),
+        Some((String::from("foo"), String::from("bar")))
+    );
+    assert_eq!(
+        iter.next(),
+        Some((String::from("hello"), String::from("world")))
+    );
 
     assert_eq!(iter.next(), None);
 }
 
 #[test]
-pub(crate) fn test_into_iter_in_for_loop(){
+pub(crate) fn test_into_iter_in_for_loop() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(3, 4);
     map.insert(5, 6);
 
-
     for x in map.into_iter() {
         println!("x: {:?}", x);
-    };
+    }
 
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
@@ -751,28 +864,27 @@ pub(crate) fn test_into_iter_in_for_loop(){
 
     for x in map {
         println!("x: {:?}", x);
-    };
+    }
 
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(5, 6);
     map.insert(3, 4);
-
 }
 
 #[test]
-pub(crate) fn test_into_iter_no_clone_trait(){
+pub(crate) fn test_into_iter_no_clone_trait() {
     let mut map = TwoWayMap::new();
     map.insert(SomeStruct { a: 101, b: 202 }, SomeStruct { a: 303, b: 403 });
     map.insert(SomeStruct { a: 0, b: 1 }, SomeStruct { a: 1, b: 0 });
 
-    for x in map{
+    for x in map {
         println!("x: {:?}", x);
-    };
+    }
 }
 
 #[test]
-pub(crate) fn test_ref_into_iter(){
+pub(crate) fn test_ref_into_iter() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(3, 4);
@@ -780,23 +892,22 @@ pub(crate) fn test_ref_into_iter(){
 
     for x in &map {
         println!("x: {:?}", x);
-    };
-
+    }
 }
 
 #[test]
-pub(crate) fn test_ref_into_iter_no_clone_trait(){
+pub(crate) fn test_ref_into_iter_no_clone_trait() {
     let mut map = TwoWayMap::new();
     map.insert(SomeStruct { a: 101, b: 202 }, SomeStruct { a: 303, b: 403 });
     map.insert(SomeStruct { a: 0, b: 1 }, SomeStruct { a: 1, b: 0 });
 
-    for x in &map{
+    for x in &map {
         println!("x: {:?}", x);
-    };
+    }
 }
 
 #[test]
-pub(crate) fn test_debug(){
+pub(crate) fn test_debug() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(3, 4);
@@ -813,7 +924,7 @@ pub(crate) fn test_debug(){
 }
 
 #[test]
-pub(crate) fn test_default(){
+pub(crate) fn test_default() {
     let map: TwoWayMap<i32, i32> = TwoWayMap::default();
     assert_eq!(map.len(), 0);
 
