@@ -1,5 +1,7 @@
-use crate::recorder::create_dummy;
-use crate::two_way_map::TwoWayMap;
+mod recorder;
+
+use recorder::create_dummy;
+use two_way_map::TwoWayMap;
 
 #[test]
 fn test_clone_counts() {

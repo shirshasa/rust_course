@@ -1,5 +1,5 @@
-use crate::two_way_map::TwoWayMap;
 use std::{ops::Bound::Included, ops::RangeBounds};
+use two_way_map::TwoWayMap;
 
 #[derive(Debug, PartialEq, Eq, Ord, PartialOrd)]
 pub(crate) struct SomeStruct {

@@ -1,5 +1,5 @@
 [package]
-name = "rust_course"
+name = "two_way_map"
 version = "0.1.0"
 edition = "2024"
 
