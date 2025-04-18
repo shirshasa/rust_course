@@ -1,11 +1,11 @@
 mod recorder;
 
-use recorder::create_dummy;
-use two_way_map::TwoWayMap;
-
+#[cfg(feature = "test-traits")]
 #[test]
 fn test_clone_counts() {
-    let (recorder, dummy) = create_dummy();
+    use two_way_map::TwoWayMap;
+
+    let (recorder, dummy) = recorder::create_dummy();
 
     let mut map = TwoWayMap::new();
     map.insert(1, dummy);
@@ -21,9 +21,12 @@ fn test_clone_counts() {
     assert_eq!(recorder.borrow().dropped, false);
 }
 
+#[cfg(feature = "test-basic")]
 #[test]
 fn test_moves() {
-    let (recorder, dummy) = create_dummy();
+    use two_way_map::TwoWayMap;
+
+    let (recorder, dummy) = recorder::create_dummy();
 
     let mut map = TwoWayMap::new();
     map.insert(1, dummy);
@@ -35,9 +38,12 @@ fn test_moves() {
     assert_eq!(recorder.borrow().dropped, false);
 }
 
+#[cfg(feature = "test-into-iterator")]
 #[test]
 fn test_into_iter_clone_counts() {
-    let (recorder, dummy) = create_dummy();
+    use two_way_map::TwoWayMap;
+
+    let (recorder, dummy) = recorder::create_dummy();
 
     {
         let mut map = TwoWayMap::new();
