@@ -8,19 +8,20 @@
     feature = "test-from-iterator",
     feature = "test-into-iterator",
     feature = "test-traits",
+    feature = "test-no-extra-deps",
 ))]
 use two_way_map::TwoWayMap;
 
 #[cfg(any(
     feature = "test-basic",
     feature = "test-removal",
-    feature = "test-traits",
     feature = "test-into-iterator",
+    feature = "test-no-extra-deps",
 ))]
 #[derive(Debug, PartialEq, Eq, Ord, PartialOrd)]
-pub(crate) struct SomeStruct {
-    pub(crate) a: i32,
-    pub(crate) b: i32,
+struct SomeStruct {
+    a: i32,
+    b: i32,
 }
 
 #[cfg(feature = "test-basic")]
@@ -1004,4 +1005,11 @@ fn test_default() {
 
     let map2: TwoWayMap<String, String> = TwoWayMap::default();
     assert_eq!(map2.len(), 0);
+}
+
+#[cfg(feature = "test-no-extra-deps")]
+#[test]
+fn test_default_no_default_trait() {
+    let map: TwoWayMap<SomeStruct, SomeStruct> = TwoWayMap::default();
+    assert_eq!(map.len(), 0);
 }
