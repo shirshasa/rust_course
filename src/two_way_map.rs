@@ -4,13 +4,13 @@ use std::{fmt::Debug, ops::RangeBounds};
 
 use crate::mem::{Rc, wrap_range, wrap_ref};
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct TwoWayMap<L, R> {
     left_to_right: std::collections::BTreeMap<Rc<L>, Rc<R>>,
     right_to_left: std::collections::BTreeMap<Rc<R>, Rc<L>>,
 }
 
-impl<L: Ord, R: Ord> TwoWayMap<L, R> {
+impl<L, R> TwoWayMap<L, R> {
     pub fn new() -> Self {
         Self {
             left_to_right: std::collections::BTreeMap::new(),
@@ -30,7 +30,9 @@ impl<L: Ord, R: Ord> TwoWayMap<L, R> {
         self.left_to_right.clear();
         self.right_to_left.clear();
     }
+}
 
+impl<L: Ord, R: Ord> TwoWayMap<L, R> {
     pub fn insert(&mut self, left: L, right: R) {
         // Check if left already exists
         if let Some(existing_right) = self.left_to_right.get(wrap_ref(&left)) {
@@ -133,7 +135,9 @@ impl<L: Ord, R: Ord> TwoWayMap<L, R> {
     {
         self.right_to_left.contains_key(wrap_ref(right))
     }
+}
 
+impl<L, R> TwoWayMap<L, R> {
     pub fn pairs(&self) -> impl Iterator<Item = (&L, &R)> {
         self.left_to_right.iter().map(|(left, right)| {
             let left = left.as_ref();
@@ -149,7 +153,9 @@ impl<L: Ord, R: Ord> TwoWayMap<L, R> {
     pub fn right_values(&self) -> impl Iterator<Item = &R> {
         self.right_to_left.keys().map(|k| k.as_ref())
     }
+}
 
+impl<L: Ord, R: Ord> TwoWayMap<L, R> {
     pub fn left_range<T>(&self, range: T) -> impl Iterator<Item = (&L, &R)>
     where
         T: RangeBounds<L>,
@@ -177,6 +183,12 @@ impl<L: Ord, R: Ord> TwoWayMap<L, R> {
 
         self.right_to_left
             .retain(|right, left| f(left.0.as_ref(), right.0.as_ref()));
+    }
+}
+
+impl<L, R> Default for TwoWayMap<L, R> {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -216,26 +228,21 @@ impl<L: Ord, R: Ord> FromIterator<(L, R)> for TwoWayMap<L, R> {
 
 pub struct IntoIter<L, R> {
     left_to_right_iter: std::collections::btree_map::IntoIter<Rc<L>, Rc<R>>,
-    right_to_left: std::collections::BTreeMap<Rc<R>, Rc<L>>,
 }
 
-impl<L: Ord, R: Ord> IntoIter<L, R> {
+impl<L, R> IntoIter<L, R> {
     fn new(map: TwoWayMap<L, R>) -> Self {
         Self {
             left_to_right_iter: map.left_to_right.into_iter(),
-            right_to_left: map.right_to_left,
         }
     }
 }
 
-impl<L: Ord, R: Ord> Iterator for IntoIter<L, R> {
+impl<L, R> Iterator for IntoIter<L, R> {
     type Item = (L, R);
 
     fn next(&mut self) -> Option<Self::Item> {
         if let Some((left, right)) = self.left_to_right_iter.next() {
-            // Remove the corresponding entry from right_to_left
-            self.right_to_left.remove(&right);
-
             let left = std::rc::Rc::try_unwrap(left.0).ok().unwrap();
             let right = std::rc::Rc::try_unwrap(right.0).ok().unwrap();
 
@@ -245,7 +252,7 @@ impl<L: Ord, R: Ord> Iterator for IntoIter<L, R> {
     }
 }
 
-impl<L: Ord, R: Ord> IntoIterator for TwoWayMap<L, R> {
+impl<L, R> IntoIterator for TwoWayMap<L, R> {
     type Item = (L, R);
 
     type IntoIter = IntoIter<L, R>;
@@ -259,7 +266,7 @@ pub struct RefIter<'l, L, R> {
     iter: collections::btree_map::Iter<'l, Rc<L>, Rc<R>>,
 }
 
-impl<'l, L: Ord, R: Ord> RefIter<'l, L, R> {
+impl<'l, L, R> RefIter<'l, L, R> {
     fn new(map_ref: &'l TwoWayMap<L, R>) -> Self {
         Self {
             iter: map_ref.left_to_right.iter(),
@@ -267,12 +274,12 @@ impl<'l, L: Ord, R: Ord> RefIter<'l, L, R> {
     }
 }
 
-impl<'l, L: Ord, R: Ord> Iterator for RefIter<'l, L, R> {
+impl<'l, L, R> Iterator for RefIter<'l, L, R> {
     type Item = (&'l L, &'l R);
 
     fn next(&mut self) -> Option<Self::Item> {
         if let Some((left, right)) = self.iter.next() {
-            let left = left.as_ref(); // do we need clone???
+            let left = left.as_ref();
             let right = right.as_ref();
             return Some((left, right));
         }
@@ -280,7 +287,7 @@ impl<'l, L: Ord, R: Ord> Iterator for RefIter<'l, L, R> {
     }
 }
 
-impl<'l, L: Ord, R: Ord> IntoIterator for &'l TwoWayMap<L, R> {
+impl<'l, L, R> IntoIterator for &'l TwoWayMap<L, R> {
     type Item = (&'l L, &'l R);
 
     type IntoIter = RefIter<'l, L, R>;

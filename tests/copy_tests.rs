@@ -61,3 +61,25 @@ fn test_into_iter_clone_counts() {
     assert_eq!(recorder.borrow().clones, 0);
     assert_eq!(recorder.borrow().dropped, true);
 }
+
+#[cfg(feature = "test-no-extra-deps")]
+#[test]
+fn test_non_ord() {
+    #[derive(Debug)]
+    struct NonOrd {}
+
+    use two_way_map::TwoWayMap;
+
+    let mut map: TwoWayMap<NonOrd, NonOrd> = TwoWayMap::new();
+    assert_eq!(map.len(), 0);
+    map.clear();
+    assert_eq!(map.len(), 0);
+    assert!(map.is_empty());
+
+    assert_eq!(map.pairs().count(), 0);
+    assert_eq!(map.left_values().count(), 0);
+    assert_eq!(map.right_values().count(), 0);
+
+    assert_eq!((&map).into_iter().count(), 0);
+    assert_eq!(map.into_iter().count(), 0);
+}
