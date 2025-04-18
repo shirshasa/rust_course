@@ -1,5 +1,8 @@
+use std::borrow::Borrow;
 use std::collections;
-use std::{fmt::Debug, ops::RangeBounds, rc::Rc};
+use std::{fmt::Debug, ops::RangeBounds};
+
+use crate::mem::{Rc, wrap_range, wrap_ref};
 
 #[derive(Debug, Default)]
 pub struct TwoWayMap<L, R> {
@@ -30,11 +33,11 @@ impl<L: Ord, R: Ord> TwoWayMap<L, R> {
 
     pub fn insert(&mut self, left: L, right: R) {
         // Check if left already exists
-        if let Some(existing_right) = self.left_to_right.get(&left) {
+        if let Some(existing_right) = self.left_to_right.get(wrap_ref(&left)) {
             self.right_to_left.remove(existing_right);
         }
         // Check if right already exists
-        if let Some(existing_left) = self.right_to_left.get(&right) {
+        if let Some(existing_left) = self.right_to_left.get(wrap_ref(&right)) {
             self.left_to_right.remove(existing_left);
         }
 
@@ -45,22 +48,28 @@ impl<L: Ord, R: Ord> TwoWayMap<L, R> {
         self.right_to_left.insert(right, left);
     }
 
-    pub fn insert_no_overwrite(&mut self, left: L, _right: R) -> Result<(), (L, R)> {
+    pub fn insert_no_overwrite(&mut self, left: L, right: R) -> Result<(), (L, R)> {
         //Check if left or right already exists
-        if self.left_to_right.contains_key(&left) || self.right_to_left.contains_key(&_right) {
-            return Err((left, _right));
+        if self.left_to_right.contains_key(wrap_ref(&left))
+            || self.right_to_left.contains_key(wrap_ref(&right))
+        {
+            return Err((left, right));
         }
-        self.insert(left, _right);
+        self.insert(left, right);
         Ok(())
     }
 
-    pub fn remove_by_left(&mut self, left: &L) -> Option<(L, R)> {
-        if let Some(right) = self.left_to_right.remove(left) {
+    pub fn remove_by_left<Q>(&mut self, left: &Q) -> Option<(L, R)>
+    where
+        L: Borrow<Q>,
+        Q: Ord + ?Sized,
+    {
+        if let Some(right) = self.left_to_right.remove(wrap_ref(left)) {
             let left = self.right_to_left.remove(&right).unwrap();
 
             // Convert Rc to L and R
-            let left = Rc::try_unwrap(left).ok().unwrap();
-            let right = Rc::try_unwrap(right).ok().unwrap();
+            let left = std::rc::Rc::try_unwrap(left.0).ok().unwrap();
+            let right = std::rc::Rc::try_unwrap(right.0).ok().unwrap();
 
             let pair = (left, right);
 
@@ -69,12 +78,16 @@ impl<L: Ord, R: Ord> TwoWayMap<L, R> {
         None
     }
 
-    pub fn remove_by_right(&mut self, right: &R) -> Option<(R, L)> {
-        if let Some(left) = self.right_to_left.remove(right) {
+    pub fn remove_by_right<Q>(&mut self, right: &Q) -> Option<(R, L)>
+    where
+        R: Borrow<Q>,
+        Q: Ord + ?Sized,
+    {
+        if let Some(left) = self.right_to_left.remove(wrap_ref(right)) {
             let right = self.left_to_right.remove(&left).unwrap().clone();
             // Convert Rc to L and R
-            let left = Rc::try_unwrap(left).ok().unwrap();
-            let right = Rc::try_unwrap(right).ok().unwrap();
+            let left = std::rc::Rc::try_unwrap(left.0).ok().unwrap();
+            let right = std::rc::Rc::try_unwrap(right.0).ok().unwrap();
 
             let pair = (right, left);
 
@@ -83,26 +96,42 @@ impl<L: Ord, R: Ord> TwoWayMap<L, R> {
         None
     }
 
-    pub fn get_by_left(&self, left: &L) -> Option<&R> {
-        if let Some(right) = self.left_to_right.get(left) {
+    pub fn get_by_left<Q>(&self, left: &Q) -> Option<&R>
+    where
+        L: Borrow<Q>,
+        Q: Ord + ?Sized,
+    {
+        if let Some(right) = self.left_to_right.get(wrap_ref(left)) {
             return Some(right.as_ref());
         }
         None
     }
 
-    pub fn get_by_right(&self, right: &R) -> Option<&L> {
-        if let Some(left) = self.right_to_left.get(right) {
+    pub fn get_by_right<Q>(&self, right: &Q) -> Option<&L>
+    where
+        R: Borrow<Q>,
+        Q: Ord + ?Sized,
+    {
+        if let Some(left) = self.right_to_left.get(wrap_ref(right)) {
             return Some(left.as_ref());
         }
         None
     }
 
-    pub fn contains_left(&self, left: &L) -> bool {
-        self.left_to_right.contains_key(left)
+    pub fn contains_left<Q>(&self, left: &Q) -> bool
+    where
+        L: Borrow<Q>,
+        Q: Ord + ?Sized,
+    {
+        self.left_to_right.contains_key(wrap_ref(left))
     }
 
-    pub fn contains_right(&self, right: &R) -> bool {
-        self.right_to_left.contains_key(right)
+    pub fn contains_right<Q>(&self, right: &Q) -> bool
+    where
+        R: Borrow<Q>,
+        Q: Ord + ?Sized,
+    {
+        self.right_to_left.contains_key(wrap_ref(right))
     }
 
     pub fn pairs(&self) -> impl Iterator<Item = (&L, &R)> {
@@ -123,21 +152,19 @@ impl<L: Ord, R: Ord> TwoWayMap<L, R> {
 
     pub fn left_range<T>(&self, range: T) -> impl Iterator<Item = (&L, &R)>
     where
-        L: Ord,
         T: RangeBounds<L>,
     {
         self.left_to_right
-            .range(range)
+            .range(wrap_range(&range))
             .map(|(left, right)| (left.as_ref(), right.as_ref()))
     }
 
     pub fn right_range<T>(&self, range: T) -> impl Iterator<Item = (&R, &L)>
     where
-        R: Ord,
         T: RangeBounds<R>,
     {
         self.right_to_left
-            .range(range)
+            .range(wrap_range(&range))
             .map(|(right, left)| (right.as_ref(), left.as_ref()))
     }
 
@@ -146,10 +173,10 @@ impl<L: Ord, R: Ord> TwoWayMap<L, R> {
         F: FnMut(&L, &R) -> bool,
     {
         self.left_to_right
-            .retain(|left, right| f(left.as_ref(), right.as_ref()));
+            .retain(|left, right| f(left.0.as_ref(), right.0.as_ref()));
 
         self.right_to_left
-            .retain(|right, left| f(left.as_ref(), right.as_ref()));
+            .retain(|right, left| f(left.0.as_ref(), right.0.as_ref()));
     }
 }
 
@@ -161,8 +188,8 @@ where
     fn clone(&self) -> Self {
         let mut other = TwoWayMap::new();
         for (left, right) in self.left_to_right.iter() {
-            let left = left.as_ref().clone();
-            let right = right.as_ref().clone();
+            let left = left.0.as_ref().clone();
+            let right = right.0.as_ref().clone();
             other.insert(left, right);
         }
         other
@@ -209,8 +236,8 @@ impl<L: Ord, R: Ord> Iterator for IntoIter<L, R> {
             // Remove the corresponding entry from right_to_left
             self.right_to_left.remove(&right);
 
-            let left = Rc::try_unwrap(left).ok().unwrap();
-            let right = Rc::try_unwrap(right).ok().unwrap();
+            let left = std::rc::Rc::try_unwrap(left.0).ok().unwrap();
+            let right = std::rc::Rc::try_unwrap(right.0).ok().unwrap();
 
             return Some((left, right));
         }
