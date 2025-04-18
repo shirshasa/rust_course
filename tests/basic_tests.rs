@@ -1,20 +1,38 @@
-use std::ops::Bound::Included;
+#[cfg(any(
+    feature = "test-basic",
+    feature = "test-insert",
+    feature = "test-removal",
+    feature = "test-retain",
+    feature = "test-iteration",
+    feature = "test-range-queries",
+    feature = "test-from-iterator",
+    feature = "test-into-iterator",
+    feature = "test-traits",
+))]
 use two_way_map::TwoWayMap;
 
+#[cfg(any(
+    feature = "test-basic",
+    feature = "test-removal",
+    feature = "test-traits",
+    feature = "test-into-iterator",
+))]
 #[derive(Debug, PartialEq, Eq, Ord, PartialOrd)]
 pub(crate) struct SomeStruct {
     pub(crate) a: i32,
     pub(crate) b: i32,
 }
 
+#[cfg(feature = "test-basic")]
 #[test]
-pub(crate) fn test_new() {
+fn test_new() {
     let map = TwoWayMap::<i32, i32>::new();
     assert_eq!(map.len(), 0);
 }
 
+#[cfg(feature = "test-basic")]
 #[test]
-pub(crate) fn test_new_no_copy_trait() {
+fn test_new_no_copy_trait() {
     let mut map = TwoWayMap::<SomeStruct, SomeStruct>::new();
     assert_eq!(map.len(), 0);
 
@@ -25,8 +43,9 @@ pub(crate) fn test_new_no_copy_trait() {
     assert_eq!(map.len(), 1);
 }
 
+#[cfg(feature = "test-basic")]
 #[test]
-pub(crate) fn test_different_types_new() {
+fn test_different_types_new() {
     let mut map = TwoWayMap::<SomeStruct, i32>::new();
     assert_eq!(map.len(), 0);
 
@@ -41,8 +60,9 @@ pub(crate) fn test_different_types_new() {
     assert_eq!(map.get_by_right(&5), Some(&SomeStruct { a: 1, b: 2 }));
 }
 
+#[cfg(feature = "test-basic")]
 #[test]
-pub(crate) fn test_is_empyty() {
+fn test_is_empty() {
     let mut map = TwoWayMap::<i32, i32>::new();
     assert!(map.is_empty());
 
@@ -56,8 +76,9 @@ pub(crate) fn test_is_empyty() {
     assert!(map.is_empty());
 }
 
+#[cfg(feature = "test-basic")]
 #[test]
-pub(crate) fn test_is_empty_some_struct() {
+fn test_is_empty_some_struct() {
     let mut map = TwoWayMap::<SomeStruct, SomeStruct>::new();
     assert!(map.is_empty());
 
@@ -70,8 +91,9 @@ pub(crate) fn test_is_empty_some_struct() {
     assert!(map.is_empty());
 }
 
+#[cfg(feature = "test-basic")]
 #[test]
-pub(crate) fn test_is_empty_string() {
+fn test_is_empty_string() {
     let mut map = TwoWayMap::<String, String>::new();
     assert!(map.is_empty());
 
@@ -84,8 +106,9 @@ pub(crate) fn test_is_empty_string() {
     assert!(map.is_empty());
 }
 
+#[cfg(feature = "test-basic")]
 #[test]
-pub(crate) fn test_clear() {
+fn test_clear() {
     let mut map = TwoWayMap::<SomeStruct, i32>::new();
     assert!(map.is_empty());
     map.insert(SomeStruct { a: 1, b: 2 }, 3);
@@ -97,8 +120,9 @@ pub(crate) fn test_clear() {
     assert_eq!(map.len(), 0);
 }
 
+#[cfg(feature = "test-basic")]
 #[test]
-pub(crate) fn test_clear_string() {
+fn test_clear_string() {
     let mut map = TwoWayMap::<String, String>::new();
     assert!(map.is_empty());
     map.insert(String::from("hello"), String::from("world"));
@@ -111,8 +135,9 @@ pub(crate) fn test_clear_string() {
     assert_eq!(map.get_by_left(&String::from("hello")), None);
 }
 
+#[cfg(feature = "test-removal")]
 #[test]
-pub(crate) fn test_len() {
+fn test_len() {
     let mut map = TwoWayMap::new();
     assert_eq!(map.len(), 0);
     map.insert(1, 2);
@@ -126,8 +151,9 @@ pub(crate) fn test_len() {
     assert_eq!(map.len(), 1);
 }
 
+#[cfg(feature = "test-removal")]
 #[test]
-pub(crate) fn test_len_string() {
+fn test_len_string() {
     let mut map = TwoWayMap::<String, String>::new();
     assert_eq!(map.len(), 0);
     map.insert(String::from("hello"), String::from("world"));
@@ -141,8 +167,9 @@ pub(crate) fn test_len_string() {
     assert_eq!(map.len(), 1);
 }
 
+#[cfg(feature = "test-insert")]
 #[test]
-pub(crate) fn test_insert() {
+fn test_insert() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     assert_eq!(map.len(), 1);
@@ -150,8 +177,9 @@ pub(crate) fn test_insert() {
     assert_eq!(map.get_by_right(&2), Some(&1));
 }
 
+#[cfg(feature = "test-basic")]
 #[test]
-pub(crate) fn test_insert_string() {
+fn test_insert_string() {
     let mut map = TwoWayMap::<String, String>::new();
     map.insert(String::from("hello"), String::from("world"));
     assert_eq!(map.len(), 1);
@@ -176,8 +204,9 @@ pub(crate) fn test_insert_string() {
     );
 }
 
+#[cfg(feature = "test-insert")]
 #[test]
-pub(crate) fn test_insert_no_overwrite() {
+fn test_insert_no_overwrite() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
 
@@ -190,8 +219,9 @@ pub(crate) fn test_insert_no_overwrite() {
     assert_eq!(map.len(), 2);
 }
 
+#[cfg(feature = "test-insert")]
 #[test]
-pub(crate) fn test_insert_no_overwrite_string() {
+fn test_insert_no_overwrite_string() {
     let mut map = TwoWayMap::<String, String>::new();
     map.insert(String::from("hello"), String::from("world"));
     assert_eq!(map.len(), 1);
@@ -212,8 +242,9 @@ pub(crate) fn test_insert_no_overwrite_string() {
     assert_eq!(map.len(), 2);
 }
 
+#[cfg(feature = "test-removal")]
 #[test]
-pub(crate) fn test_remove_by_left() {
+fn test_remove_by_left() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(3, 4);
@@ -227,8 +258,9 @@ pub(crate) fn test_remove_by_left() {
     assert_eq!(map.get_by_left(&3), Some(&4));
 }
 
+#[cfg(feature = "test-removal")]
 #[test]
-pub(crate) fn test_remove_by_left_string() {
+fn test_remove_by_left_string() {
     let mut map = TwoWayMap::<String, String>::new();
     map.insert(String::from("hello"), String::from("world"));
     map.insert(String::from("foo"), String::from("bar"));
@@ -248,8 +280,9 @@ pub(crate) fn test_remove_by_left_string() {
     );
 }
 
+#[cfg(feature = "test-removal")]
 #[test]
-pub(crate) fn test_remove_by_right() {
+fn test_remove_by_right() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(3, 4);
@@ -263,8 +296,9 @@ pub(crate) fn test_remove_by_right() {
     assert_eq!(map.get_by_left(&3), Some(&4));
 }
 
+#[cfg(feature = "test-removal")]
 #[test]
-pub(crate) fn test_remove_by_right_string() {
+fn test_remove_by_right_string() {
     let mut map = TwoWayMap::<String, String>::new();
     map.insert(String::from("hello"), String::from("world"));
     map.insert(String::from("foo"), String::from("bar"));
@@ -284,8 +318,9 @@ pub(crate) fn test_remove_by_right_string() {
     );
 }
 
+#[cfg(feature = "test-removal")]
 #[test]
-pub(crate) fn test_remove_some_struct() {
+fn test_remove_some_struct() {
     // by left
     let mut map = TwoWayMap::<SomeStruct, SomeStruct>::new();
     assert_eq!(map.len(), 0);
@@ -322,8 +357,9 @@ pub(crate) fn test_remove_some_struct() {
     assert_eq!(map.get_by_left(&SomeStruct { a: 5, b: 6 }), None);
 }
 
+#[cfg(feature = "test-basic")]
 #[test]
-pub(crate) fn test_get() {
+fn test_get() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(3, 4);
@@ -335,8 +371,9 @@ pub(crate) fn test_get() {
     assert_eq!(map.get_by_right(&6), None);
 }
 
+#[cfg(feature = "test-basic")]
 #[test]
-pub(crate) fn test_get_string() {
+fn test_get_string() {
     let mut map = TwoWayMap::<String, String>::new();
     map.insert(String::from("hello"), String::from("world"));
     map.insert(String::from("foo"), String::from("bar"));
@@ -361,8 +398,9 @@ pub(crate) fn test_get_string() {
     assert_eq!(map.get_by_right(&String::from("qux")), None);
 }
 
+#[cfg(feature = "test-basic")]
 #[test]
-pub(crate) fn test_contains() {
+fn test_contains() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(3, 4);
@@ -381,8 +419,9 @@ pub(crate) fn test_contains() {
     assert!(!map3.contains_left(&"foo"));
 }
 
+#[cfg(feature = "test-basic")]
 #[test]
-pub(crate) fn test_contains_some_struct() {
+fn test_contains_some_struct() {
     let mut map2 = TwoWayMap::new();
     let s1 = SomeStruct { a: 1, b: 2 };
     let s2 = SomeStruct { a: 3, b: 4 };
@@ -392,8 +431,9 @@ pub(crate) fn test_contains_some_struct() {
     assert!(!map2.contains_right(&SomeStruct { a: 7, b: 8 }));
 }
 
+#[cfg(feature = "test-basic")]
 #[test]
-pub(crate) fn test_contains_string() {
+fn test_contains_string() {
     let mut map4 = TwoWayMap::new();
     let s1 = String::from("hello");
     let s2 = String::from("world");
@@ -403,8 +443,10 @@ pub(crate) fn test_contains_string() {
     assert!(!map4.contains_left(&String::from("foo")));
     assert!(!map4.contains_right(&String::from("bar")));
 }
+
+#[cfg(feature = "test-iteration")]
 #[test]
-pub(crate) fn test_pairs() {
+fn test_pairs() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(3, 4);
@@ -414,8 +456,9 @@ pub(crate) fn test_pairs() {
     assert_eq!(pairs[1], (&3, &4));
 }
 
+#[cfg(feature = "test-iteration")]
 #[test]
-pub(crate) fn test_pairs_string() {
+fn test_pairs_string() {
     let mut map = TwoWayMap::new();
     map.insert(String::from("hello"), String::from("world"));
     map.insert(String::from("foo"), String::from("bar"));
@@ -425,8 +468,9 @@ pub(crate) fn test_pairs_string() {
     assert_eq!(pairs[0], (&String::from("foo"), &String::from("bar")));
 }
 
+#[cfg(feature = "test-iteration")]
 #[test]
-pub(crate) fn test_pairs_ascending() {
+fn test_pairs_ascending() {
     // test that output is ascending
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
@@ -444,8 +488,9 @@ pub(crate) fn test_pairs_ascending() {
     assert_eq!(pairs[4], (&9, &10));
 }
 
+#[cfg(feature = "test-iteration")]
 #[test]
-pub(crate) fn test_pairs_are_not_consumed() {
+fn test_pairs_are_not_consumed() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(3, 4);
@@ -460,8 +505,9 @@ pub(crate) fn test_pairs_are_not_consumed() {
     assert_eq!(map.get_by_right(&4), Some(&3));
 }
 
+#[cfg(feature = "test-iteration")]
 #[test]
-pub(crate) fn test_pairs_are_not_consumed_string() {
+fn test_pairs_are_not_consumed_string() {
     let mut map = TwoWayMap::new();
     map.insert(String::from("hello"), String::from("world"));
     map.insert(String::from("foo"), String::from("bar"));
@@ -482,8 +528,9 @@ pub(crate) fn test_pairs_are_not_consumed_string() {
     );
 }
 
+#[cfg(feature = "test-iteration")]
 #[test]
-pub(crate) fn test_left_values() {
+fn test_left_values() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(5, 20);
@@ -495,8 +542,9 @@ pub(crate) fn test_left_values() {
     assert_eq!(left_values, vec![&1, &3, &5, &100]);
 }
 
+#[cfg(feature = "test-iteration")]
 #[test]
-pub(crate) fn test_left_values_string() {
+fn test_left_values_string() {
     let mut map = TwoWayMap::new();
     map.insert(String::from("hello"), String::from("world"));
     map.insert(String::from("foo"), String::from("bar"));
@@ -514,8 +562,9 @@ pub(crate) fn test_left_values_string() {
     );
 }
 
+#[cfg(feature = "test-iteration")]
 #[test]
-pub(crate) fn test_right_values() {
+fn test_right_values() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(5, 20);
@@ -526,8 +575,9 @@ pub(crate) fn test_right_values() {
     assert_eq!(right_values, vec![&0, &2, &4, &20]);
 }
 
+#[cfg(feature = "test-iteration")]
 #[test]
-pub(crate) fn test_right_values_string() {
+fn test_right_values_string() {
     let mut map = TwoWayMap::new();
     map.insert(String::from("hello"), String::from("world"));
     map.insert(String::from("foo"), String::from("bar"));
@@ -545,8 +595,11 @@ pub(crate) fn test_right_values_string() {
     );
 }
 
+#[cfg(feature = "test-range-queries")]
 #[test]
-pub(crate) fn test_range() {
+fn test_range() {
+    use std::ops::Bound::Included;
+
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(3, 4);
@@ -566,8 +619,9 @@ pub(crate) fn test_range() {
     assert_eq!(range, vec![(&5, &6)]);
 }
 
+#[cfg(feature = "test-range-queries")]
 #[test]
-pub(crate) fn test_range_literal_string() {
+fn test_range_literal_string() {
     let mut map = TwoWayMap::new();
     map.insert("hello", "world");
     map.insert("foo", "bar");
@@ -582,8 +636,9 @@ pub(crate) fn test_range_literal_string() {
     assert_eq!(range, vec![(&"baz", &"qux")]);
 }
 
+#[cfg(feature = "test-range-queries")]
 #[test]
-pub(crate) fn test_range_string() {
+fn test_range_string() {
     let mut map = TwoWayMap::new();
     map.insert(String::from("hello"), String::from("world"));
     map.insert(String::from("foo"), String::from("bar"));
@@ -606,6 +661,7 @@ pub(crate) fn test_range_string() {
     assert_eq!(range, vec![(&String::from("baz"), &String::from("qux"))]);
 }
 
+#[cfg(feature = "test-range-queries")]
 #[test]
 fn test_left_range_string_one_more() {
     let mut map = TwoWayMap::new();
@@ -625,8 +681,9 @@ fn test_left_range_string_one_more() {
     );
 }
 
+#[cfg(feature = "test-retain")]
 #[test]
-pub(crate) fn test_retain() {
+fn test_retain() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(2, 4);
@@ -642,8 +699,9 @@ pub(crate) fn test_retain() {
     assert_eq!(map.get_by_right(&4), Some(&2));
 }
 
+#[cfg(feature = "test-retain")]
 #[test]
-pub(crate) fn test_retain_string() {
+fn test_retain_string() {
     let mut map = TwoWayMap::new();
     map.insert(String::from("hello"), String::from("world"));
     map.insert(String::from("foo"), String::from("bar"));
@@ -665,8 +723,9 @@ pub(crate) fn test_retain_string() {
     );
 }
 
+#[cfg(feature = "test-traits")]
 #[test]
-pub(crate) fn test_clone() {
+fn test_clone() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(3, 4);
@@ -681,8 +740,9 @@ pub(crate) fn test_clone() {
     );
 }
 
+#[cfg(feature = "test-traits")]
 #[test]
-pub(crate) fn test_clone_string() {
+fn test_clone_string() {
     let mut map = TwoWayMap::new();
     map.insert(String::from("hello"), String::from("world"));
     map.insert(String::from("foo"), String::from("bar"));
@@ -697,8 +757,9 @@ pub(crate) fn test_clone_string() {
     );
 }
 
+#[cfg(feature = "test-traits")]
 #[test]
-pub(crate) fn test_extend() {
+fn test_extend() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(3, 4);
@@ -711,8 +772,9 @@ pub(crate) fn test_extend() {
     assert_eq!(map.get_by_right(&8), Some(&7));
 }
 
+#[cfg(feature = "test-traits")]
 #[test]
-pub(crate) fn test_extend_string() {
+fn test_extend_string() {
     let mut map = TwoWayMap::new();
     map.insert(String::from("hello"), String::from("world"));
     map.insert(String::from("foo"), String::from("bar"));
@@ -734,8 +796,9 @@ pub(crate) fn test_extend_string() {
     );
 }
 
+#[cfg(feature = "test-from-iterator")]
 #[test]
-pub(crate) fn test_from_iterator() {
+fn test_from_iterator() {
     let pairs = vec![(1, 2), (3, 4), (5, 6)];
     let map: TwoWayMap<i32, i32> = TwoWayMap::from_iter(pairs);
 
@@ -745,8 +808,9 @@ pub(crate) fn test_from_iterator() {
     assert_eq!(map.get_by_left(&5), Some(&6));
 }
 
+#[cfg(feature = "test-from-iterator")]
 #[test]
-pub(crate) fn test_from_iterator_string() {
+fn test_from_iterator_string() {
     let pairs = vec![
         (String::from("hello"), String::from("world")),
         (String::from("foo"), String::from("bar")),
@@ -764,8 +828,9 @@ pub(crate) fn test_from_iterator_string() {
     );
 }
 
+#[cfg(feature = "test-into-iterator")]
 #[test]
-pub(crate) fn test_into_iter() {
+fn test_into_iter() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(5, 6);
@@ -779,8 +844,9 @@ pub(crate) fn test_into_iter() {
     assert_eq!(iter.next(), None);
 }
 
+#[cfg(feature = "test-into-iterator")]
 #[test]
-pub(crate) fn test_into_iter_string() {
+fn test_into_iter_string() {
     let mut map = TwoWayMap::new();
     map.insert(String::from("hello"), String::from("world"));
     map.insert(String::from("foo"), String::from("bar"));
@@ -803,8 +869,9 @@ pub(crate) fn test_into_iter_string() {
     assert_eq!(iter.next(), None);
 }
 
+#[cfg(feature = "test-into-iterator")]
 #[test]
-pub(crate) fn test_into_iter_with_clone() {
+fn test_into_iter_with_clone() {
     let mut map1 = TwoWayMap::new();
     map1.insert(1, 2);
     map1.insert(5, 6);
@@ -820,8 +887,9 @@ pub(crate) fn test_into_iter_with_clone() {
     assert_eq!(iter.next(), None);
 }
 
+#[cfg(feature = "test-into-iterator")]
 #[test]
-pub(crate) fn test_into_iter_string_with_clone() {
+fn test_into_iter_string_with_clone() {
     let mut map1 = TwoWayMap::new();
     map1.insert(String::from("hello"), String::from("world"));
     map1.insert(String::from("foo"), String::from("bar"));
@@ -846,8 +914,9 @@ pub(crate) fn test_into_iter_string_with_clone() {
     assert_eq!(iter.next(), None);
 }
 
+#[cfg(feature = "test-into-iterator")]
 #[test]
-pub(crate) fn test_into_iter_in_for_loop() {
+fn test_into_iter_in_for_loop() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(3, 4);
@@ -872,8 +941,9 @@ pub(crate) fn test_into_iter_in_for_loop() {
     map.insert(3, 4);
 }
 
+#[cfg(feature = "test-into-iterator")]
 #[test]
-pub(crate) fn test_into_iter_no_clone_trait() {
+fn test_into_iter_no_clone_trait() {
     let mut map = TwoWayMap::new();
     map.insert(SomeStruct { a: 101, b: 202 }, SomeStruct { a: 303, b: 403 });
     map.insert(SomeStruct { a: 0, b: 1 }, SomeStruct { a: 1, b: 0 });
@@ -883,8 +953,9 @@ pub(crate) fn test_into_iter_no_clone_trait() {
     }
 }
 
+#[cfg(feature = "test-into-iterator")]
 #[test]
-pub(crate) fn test_ref_into_iter() {
+fn test_ref_into_iter() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(3, 4);
@@ -895,8 +966,9 @@ pub(crate) fn test_ref_into_iter() {
     }
 }
 
+#[cfg(feature = "test-into-iterator")]
 #[test]
-pub(crate) fn test_ref_into_iter_no_clone_trait() {
+fn test_ref_into_iter_no_clone_trait() {
     let mut map = TwoWayMap::new();
     map.insert(SomeStruct { a: 101, b: 202 }, SomeStruct { a: 303, b: 403 });
     map.insert(SomeStruct { a: 0, b: 1 }, SomeStruct { a: 1, b: 0 });
@@ -906,8 +978,9 @@ pub(crate) fn test_ref_into_iter_no_clone_trait() {
     }
 }
 
+#[cfg(feature = "test-traits")]
 #[test]
-pub(crate) fn test_debug() {
+fn test_debug() {
     let mut map = TwoWayMap::new();
     map.insert(1, 2);
     map.insert(3, 4);
@@ -923,8 +996,9 @@ pub(crate) fn test_debug() {
     println!("{:?}", map2);
 }
 
+#[cfg(feature = "test-traits")]
 #[test]
-pub(crate) fn test_default() {
+fn test_default() {
     let map: TwoWayMap<i32, i32> = TwoWayMap::default();
     assert_eq!(map.len(), 0);
 

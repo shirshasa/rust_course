@@ -12,3 +12,15 @@ unsafe-code = "forbid"
 
 [lints.clippy]
 all = "deny"
+
+[features]
+test-basic = []
+test-insert = []
+test-removal = []
+test-retain = []
+test-iteration = []
+test-range-queries = []
+test-from-iterator = []
+test-into-iterator = []
+test-traits = []
+test-borrow-trait = []
